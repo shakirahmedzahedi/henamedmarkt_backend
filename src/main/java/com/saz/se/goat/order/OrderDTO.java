@@ -34,4 +34,5 @@ public class OrderDTO
     private long vatOrTex;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private long shippingCharge;
 }

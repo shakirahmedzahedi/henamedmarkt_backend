@@ -64,6 +64,11 @@ public class OrderEntity {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
 
+    @Column(nullable = false)
+    @Min(value = 0, message = "shippingCharge must be greater than or equal to 0")
+    @NotNull(message = "shippingCharge is required")
+    private long shippingCharge;
+
 
     public OrderEntity(CartEntity cartEntity, UserEntity userEntity, Address address, PaymentMethod paymentMethod,
                        PaymentStatus paymentStatus, OrderStatus orderStatus, DiscountCouponEntity discountCoupon)
@@ -79,6 +84,7 @@ public class OrderEntity {
         this.vatOrTex = calculateVatOrTex(5);
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
+        this.shippingCharge = 120;
     }
 
     public long getId() {
@@ -182,6 +188,14 @@ public class OrderEntity {
         this.updatedAt = LocalDateTime.now();
     }
 
+    public long getShippingCharge() {
+        return shippingCharge;
+    }
+
+    public void setShippingCharge(long shippingCharge) {
+        this.shippingCharge = shippingCharge;
+    }
+
     public long calculateTotalAmount()
     {
         /*long sum = cartEntity.getArticles().stream()
@@ -209,7 +223,7 @@ public class OrderEntity {
         {
             sum = sum - 200;
         }
-        return  sum;
+        return  sum+shippingCharge;
     }
 
     private long applyDiscount(DiscountCouponEntity discountCoupon)

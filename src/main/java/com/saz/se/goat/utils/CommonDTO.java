@@ -188,7 +188,8 @@ public class CommonDTO {
                 orderEntity.getTotalAmount(),
                 orderEntity.getVatOrTex(),
                 orderEntity.getCreatedAt(),
-                orderEntity.getUpdatedAt());
+                orderEntity.getUpdatedAt(),
+                orderEntity.getShippingCharge());
 
     }
 

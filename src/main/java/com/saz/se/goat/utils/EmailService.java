@@ -30,7 +30,7 @@ public class EmailService {
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
         helper.setFrom(sender);
         helper.setTo(user.getEmail());
-        helper.setSubject("Confirm your E-Mail - HENAMEDMARKT Registration");
+        helper.setSubject("Verify your email address to complete the registration");
         helper.setText(
                 "<html>\n" +
                         "   <body>\n" +
@@ -38,7 +38,7 @@ public class EmailService {
                         "       <h2>Active your HenaMedMarkt account</h2>\n" +
                          "<br/> "  + generateConfirmationLink(user.getEmail())+"" +
                         "       <p>If you don’t use this link within 30 minutes, it will expire.</p>\n" +
-                        "       <p>Thanks,<br>HenaMedMarkt Team</p>\n" +
+                        "       <p>Thanks,<br>henamedmarkt Team</p>\n" +
                         "   </body>\n" +
                         "</html>"
                 , true);
@@ -52,7 +52,7 @@ public class EmailService {
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
         helper.setFrom(sender);
         helper.setTo(user.getEmail());
-        helper.setSubject("Reset Your Password - HENAMEDMARKT ");
+        helper.setSubject("Reset Your Password ");
         helper.setText(
                 "<html>\n" +
                         "   <body>\n" +

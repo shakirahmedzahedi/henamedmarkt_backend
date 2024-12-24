@@ -80,11 +80,11 @@ public class OrderEntity {
         this.paymentStatus = paymentStatus;
         this.orderStatus = orderStatus;
         this.discountCoupon = discountCoupon;
+        this.shippingCharge = 120;
         this.totalAmount = calculateTotalAmount();
         this.vatOrTex = calculateVatOrTex(5);
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
-        this.shippingCharge = 120;
     }
 
     public long getId() {
@@ -198,10 +198,7 @@ public class OrderEntity {
 
     public long calculateTotalAmount()
     {
-        /*long sum = cartEntity.getArticles().stream()
-                .mapToLong(article -> article.getProduct().getPrice() * article.getUnit())
-                .sum();
-*/
+
         long sum = cartEntity.getArticles().stream()
                 .mapToLong(article -> {
                     long price = article.getProduct().getPrice();

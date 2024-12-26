@@ -3,6 +3,8 @@ package com.saz.se.goat.config;
 import com.saz.se.goat.auth.AuthenticationService;
 import com.saz.se.goat.utils.GoatUserDetailsService;
 import com.saz.se.goat.utils.JWTService;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -103,16 +105,21 @@ public class JwtFilter extends OncePerRequestFilter {
                     }
                 }
             }
-        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+        }  catch (ExpiredJwtException e) {
             logger.error("Token has expired", e);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("Token has expired. Please log in again.");
             return; // Stop further processing
-        } catch (Exception e) {
-            logger.error("Error processing the token", e);
+        } catch (JwtException e) {
+            logger.error("JWT Exception", e);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("Authentication error. Please log in again.");
             return; // Stop further processing
+        } catch (Exception e) {
+            logger.error("General error", e);
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Unexpected error. Please try again.");
+            return;
         }
 
         // Continue with the filter chain if no issues

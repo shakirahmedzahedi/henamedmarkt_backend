@@ -71,7 +71,7 @@ public class OrderEntity {
 
 
     public OrderEntity(CartEntity cartEntity, UserEntity userEntity, Address address, PaymentMethod paymentMethod,
-                       PaymentStatus paymentStatus, OrderStatus orderStatus, DiscountCouponEntity discountCoupon)
+                       PaymentStatus paymentStatus, OrderStatus orderStatus, DiscountCouponEntity discountCoupon, long shippingCharge)
     {
         this.cartEntity = cartEntity;
         this.userEntity = userEntity;
@@ -80,7 +80,7 @@ public class OrderEntity {
         this.paymentStatus = paymentStatus;
         this.orderStatus = orderStatus;
         this.discountCoupon = discountCoupon;
-        this.shippingCharge = 120;
+        this.shippingCharge = shippingCharge;
         this.totalAmount = calculateTotalAmount();
         this.vatOrTex = calculateVatOrTex(5);
         this.createdAt = LocalDateTime.now();

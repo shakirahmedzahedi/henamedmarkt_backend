@@ -56,7 +56,7 @@ public class OrderService
         PaymentStatus paymentStatus = PaymentStatus.valueOf(orderRequest.getPaymentStatus().toUpperCase());
         OrderStatus orderStatus = OrderStatus.valueOf(orderRequest.getOrderStatus().toUpperCase());
 
-        OrderEntity order = new OrderEntity(cart, user, address, paymentMethod, paymentStatus, orderStatus, discountCoupon);
+        OrderEntity order = new OrderEntity(cart, user, address, paymentMethod, paymentStatus, orderStatus, discountCoupon,orderRequest.getShippingCharge());
 
         orderRepository.save(order);
         user.getOrderEntityList().add(order);

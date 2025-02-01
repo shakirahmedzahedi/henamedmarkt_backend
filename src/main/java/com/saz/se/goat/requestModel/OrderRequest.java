@@ -22,4 +22,5 @@ public class OrderRequest
     private String paymentStatus;
     private String orderStatus;
     private String discountCouponNumber;
+    private long shippingCharge;
 }

@@ -6,6 +6,7 @@ public enum OrderStatus
     DELIVERED,
     PENDING,
     REVIEW,
-    OUT_FOR_DELIVERY
+    OUT_FOR_DELIVERY,
+    CANCEL,
 
 }

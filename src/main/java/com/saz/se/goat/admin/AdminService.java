@@ -53,12 +53,21 @@ public class AdminService
     public Optional<ProductEntity> updateProductById(long id, UpdateProductRequest request)
     {
         ProductEntity product = productRepository.getReferenceById(id);
+
+        product.setTitle(request.getTitle());
+        product.setDescription(request.getDescription());
+        product.setCategory(String.valueOf(request.getCategory()));
         product.setDiscountPercentage(request.getDiscountPercentage());
         product.setStock(request.getStock());
         product.setPrice(request.getPrice());
         product.setThumbnail(request.getThumbnail());
+        product.setBrand(request.getBrand());
+        product.setTags(String.valueOf(request.getTags()));
         product.setRating(request.getRating());
+        product.setWeight(request.getWeight());
+        product.setSize(request.getSize());
         product.setBestSeller(request.isBestSeller());
+        product.setNewArrival(request.isNewArrival());
         productRepository.save(product);
 
         return Optional.of(product);

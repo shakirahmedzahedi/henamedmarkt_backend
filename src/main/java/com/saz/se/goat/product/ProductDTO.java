@@ -26,5 +26,6 @@ public class ProductDTO
     private String thumbnail;
     private boolean bestSeller;
     private boolean active;
+    private boolean newArrival;
 
 }

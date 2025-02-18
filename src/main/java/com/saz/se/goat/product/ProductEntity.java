@@ -70,6 +70,7 @@ public class ProductEntity {
     private boolean bestSeller;
 
     private boolean active;
+    private boolean newArrival;
     @ManyToMany(mappedBy = "favorites", fetch = FetchType.LAZY)
     private List<UserEntity> users = new ArrayList<>();
 
@@ -93,6 +94,7 @@ public class ProductEntity {
         this.thumbnail = thumbnail;
         this.bestSeller = false;
         this.active = true;
+        this.newArrival = true;
     }
 
     public String getAdditionalInfo() {
@@ -237,6 +239,14 @@ public class ProductEntity {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public boolean isNewArrival() {
+        return newArrival;
+    }
+
+    public void setNewArrival(boolean newArrival) {
+        this.newArrival = newArrival;
     }
 
     @Override

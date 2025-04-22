@@ -86,8 +86,8 @@ public class AuthenticationService {
             userRepository.save(user);
             //emailService.sendConfirmationEmail(user);
             String otp = otpService.generateOtp(user.getPhoneNo(), user.getEmail());
-            /*String fcmtoken = fcmDeviceRepository.findByDevice("admin-phone").get().getFcmToken();
-            fcmService.sendOtpNotification(fcmtoken,otp,user.getPhoneNo());*/
+            String fcmtoken = fcmDeviceRepository.findByDevice("admin-phone").get().getFcmToken();
+            fcmService.sendOtpNotification(fcmtoken,otp,user.getPhoneNo());
             response.setData("User registered. OTP verification needed.");
         }
         catch (Exception ex)
@@ -194,6 +194,8 @@ public class AuthenticationService {
         {
            //emailService.sendForgetPasswordEmail(userEntity.get());
             String otp = otpService.generateOtp(userEntity.get().getPhoneNo(), userEntity.get().getEmail());
+            String fcmtoken = fcmDeviceRepository.findByDevice("admin-phone").get().getFcmToken();
+            fcmService.sendOtpNotification(fcmtoken,otp,userEntity.get().getPhoneNo());
            response.setData(new UserForgetPassResponse(userEntity.get().getEmail(), userEntity.get().getPhoneNo()));
         }
         else

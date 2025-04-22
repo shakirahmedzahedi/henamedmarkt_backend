@@ -110,6 +110,6 @@ jobs:
             docker rm goat || true
 
             docker run -d --name goat -p 8080:8080 \
-              -e FIREBASE_JSON=${{ secrets.FIREBASE_JSON }} \
+              -e FIREBASE_JSON='${{ secrets.FIREBASE_JSON }}' \
               -e GOOGLE_APPLICATION_CREDENTIALS=/firebase/firebase.json \
               ${{ secrets.AZURE_REGISTRY_LOGIN_SERVER }}/api:${{ github.sha }}

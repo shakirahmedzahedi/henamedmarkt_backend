@@ -82,8 +82,10 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
+          echo "${{ secrets.FIREBASE_JSON }}" > firebase.json
+
           docker buildx build . \
-            --build-arg FIREBASE_JSON="${{ secrets.FIREBASE_JSON }}" \
+            --build-arg FIREBASE_JSON="$(cat firebase.json)" \
             --tag ${{ secrets.AZURE_REGISTRY_LOGIN_SERVER }}/api:${{ github.sha }} \
             --push
 

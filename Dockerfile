@@ -45,6 +45,9 @@ FROM openjdk:17-jdk-slim
 
 WORKDIR /app
 
+# ✅ Install jq
+RUN apt-get update && apt-get install -y jq && apt-get clean
+
 # Copy the built jar from the builder stage
 COPY --from=builder /app/target/goat-0.0.1-SNAPSHOT.jar app.jar
 

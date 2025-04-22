@@ -76,7 +76,7 @@ jobs:
 
       - name: Build and Push Docker Image to ACR
         run: |
-          docker build --build-arg FIREBASE_JSON="${{ secrets.FIREBASE_JSON }}" -t ${{ secrets.AZURE_REGISTRY_LOGIN_SERVER }}/api:${{ github.sha }} .
+          docker buildx build --build-arg FIREBASE_JSON="${{ secrets.FIREBASE_JSON }}" -t ${{ secrets.AZURE_REGISTRY_LOGIN_SERVER }}/api:${{ github.sha }} .
           docker push ${{ secrets.AZURE_REGISTRY_LOGIN_SERVER }}/api:${{ github.sha }}
 
   deploy:

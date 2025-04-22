@@ -82,10 +82,10 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          docker buildx build \
+          docker buildx build . \
             --build-arg FIREBASE_JSON="${{ secrets.FIREBASE_JSON }}" \
             --tag ${{ secrets.AZURE_REGISTRY_LOGIN_SERVER }}/api:${{ github.sha }} \
-            --push .
+            --push
 
   deploy:
     runs-on: ubuntu-latest

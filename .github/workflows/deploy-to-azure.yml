@@ -113,6 +113,5 @@ jobs:
             echo '${{ secrets.FIREBASE_JSON }}' > /firebase/firebase.json
 
             docker run -d --name goat -p 8080:8080 \
-              -v /firebase/firebase.json:/firebase/firebase.json \
-              -e GOOGLE_APPLICATION_CREDENTIALS=/firebase/firebase.json \
+              -e FIREBASE_JSON="${{ secrets.FIREBASE_JSON }}" \
               ${{ secrets.AZURE_REGISTRY_LOGIN_SERVER }}/api:${{ github.sha }}

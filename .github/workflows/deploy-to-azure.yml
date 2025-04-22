@@ -64,6 +64,9 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Log in to Azure
         uses: azure/login@v1
         with:
@@ -76,11 +79,7 @@ jobs:
 
       - name: Build and Push Docker Image to ACR
         run: |
-          docker build \
-            --build-arg FIREBASE_JSON="${{ secrets.FIREBASE_JSON }}" \
-            -t ${{ secrets.AZURE_REGISTRY_LOGIN_SERVER }}/api:${{ github.sha }} \
-            .
-          docker push ${{ secrets.AZURE_REGISTRY_LOGIN_SERVER }}/api:${{ github.sha }}
+          docker buildx build --build-arg FIREBASE_JSON="${{ secrets.FIREBASE_JSON }}" --tag ${{ secrets.AZURE_REGISTRY_LOGIN_SERVER }}/api:${{ github.sha }} --push .  
 
   deploy:
     runs-on: ubuntu-latest

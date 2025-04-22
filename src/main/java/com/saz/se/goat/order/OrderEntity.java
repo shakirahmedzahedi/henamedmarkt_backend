@@ -17,6 +17,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -83,8 +85,11 @@ public class OrderEntity {
         this.shippingCharge = shippingCharge;
         this.totalAmount = calculateTotalAmount();
         this.vatOrTex = calculateVatOrTex(5);
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+        this.createdAt = getBangladeshTimeNow();;
+        this.updatedAt = getBangladeshTimeNow();;
+    }
+    private static LocalDateTime getBangladeshTimeNow() {
+        return ZonedDateTime.now(ZoneId.of("Asia/Dhaka")).toLocalDateTime();
     }
 
     public long getId() {
@@ -185,7 +190,7 @@ public class OrderEntity {
 
     @PreUpdate
     public void setUpdatedAt() {
-        this.updatedAt = LocalDateTime.now();
+        this.updatedAt = getBangladeshTimeNow();
     }
 
     public long getShippingCharge() {

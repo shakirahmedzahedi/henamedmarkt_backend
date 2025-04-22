@@ -25,4 +25,7 @@ public class UserResponse
     private boolean active;
     private boolean initialDiscount;
     private Address address;
+
+    public UserResponse(String email, String phoneNo) {
+    }
 }

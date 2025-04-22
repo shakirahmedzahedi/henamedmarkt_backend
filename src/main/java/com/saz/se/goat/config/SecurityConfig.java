@@ -47,6 +47,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/order/**").permitAll()
                         .requestMatchers("/api/v1/discountCoupon/**").permitAll()
                         .requestMatchers("/swagger-ui.html/**","/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/api/v1/fcmtokenresgistration").permitAll()
+                        .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/api/v1/chat/**").permitAll()
                         .anyRequest().authenticated())
                 //httpBasic(Customizer.withDefaults()).
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

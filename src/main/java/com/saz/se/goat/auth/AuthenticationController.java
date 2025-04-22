@@ -1,7 +1,9 @@
 package com.saz.se.goat.auth;
 
 import com.saz.se.goat.model.ErrorModel;
+import com.saz.se.goat.model.ResendOTPRequest;
 import com.saz.se.goat.model.ResponseWrapper;
+import com.saz.se.goat.model.UserForgetPassResponse;
 import com.saz.se.goat.requestModel.ForgetPasswordRequest;
 import com.saz.se.goat.requestModel.SignInRequest;
 import com.saz.se.goat.requestModel.SignUpRequest;
@@ -34,6 +36,13 @@ public class AuthenticationController {
     }
 
     @CrossOrigin
+    @PostMapping("/resendotp")
+    public ResponseEntity<?> resendOTP(@RequestBody ResendOTPRequest request, @RequestHeader HttpHeaders header) throws MessagingException {
+        ResponseWrapper response = authenticationService.resendOTP(request);
+        return jsonUtils.responseAsJson(response);
+    }
+
+    @CrossOrigin
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody SignUpRequest request, @RequestHeader HttpHeaders header) throws MessagingException {
         ResponseWrapper response = authenticationService.signup(request);
@@ -59,7 +68,7 @@ public class AuthenticationController {
         return jsonUtils.responseAsJsonWithToken(response,request.getEmail());
     }
 
-    @CrossOrigin
+    /*@CrossOrigin
     @GetMapping("/confirmEmail")
     public void activeAccount(@RequestParam String token, @RequestHeader HttpHeaders header, HttpServletResponse response) throws IOException {
         ResponseWrapper responseWrapper = authenticationService.activeAccount(token);
@@ -68,6 +77,13 @@ public class AuthenticationController {
         } else {
             response.sendRedirect(baseUrl+"/signIn?status=activation_failed");
         }
+    }*/
+
+    @CrossOrigin
+    @GetMapping("/varifyOTP")
+    public ResponseEntity<?> activeAccount(@RequestParam String phoneNo,@RequestParam String otp, @RequestHeader HttpHeaders header) throws IOException {
+        ResponseWrapper<String> response = authenticationService.activeAccount(phoneNo,otp);
+        return jsonUtils.responseAsJson(response);
     }
 
     @CrossOrigin
@@ -82,7 +98,7 @@ public class AuthenticationController {
     @CrossOrigin
     @GetMapping("/sendEmailForRestPassword")
     public ResponseEntity<?> sendEmailForRestPassword(@RequestParam String email, @RequestHeader HttpHeaders header) throws IOException, MessagingException {
-        ResponseWrapper<String> response = authenticationService.sendEmailForRestPassword(email);
+        ResponseWrapper<UserForgetPassResponse> response = authenticationService.sendEmailForRestPassword(email);
         return jsonUtils.responseAsJson(response);
 
     }

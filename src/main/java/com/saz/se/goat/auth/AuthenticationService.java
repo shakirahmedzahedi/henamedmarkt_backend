@@ -1,7 +1,13 @@
 package com.saz.se.goat.auth;
 
+import com.saz.se.goat.fcm.FcmDevice;
+import com.saz.se.goat.fcm.FcmDeviceRepository;
 import com.saz.se.goat.model.ErrorModel;
+import com.saz.se.goat.model.ResendOTPRequest;
 import com.saz.se.goat.model.ResponseWrapper;
+import com.saz.se.goat.model.UserForgetPassResponse;
+import com.saz.se.goat.otp.FCMService;
+import com.saz.se.goat.otp.OtpService;
 import com.saz.se.goat.requestModel.ForgetPasswordRequest;
 import com.saz.se.goat.requestModel.SignInRequest;
 import com.saz.se.goat.requestModel.SignUpRequest;
@@ -42,6 +48,12 @@ public class AuthenticationService {
     private UserRepository userRepository;
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private OtpService otpService;
+    @Autowired
+    private FCMService fcmService;
+    @Autowired
+    private FcmDeviceRepository fcmDeviceRepository;
     CommonDTO commonDTO = new CommonDTO();
 
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
@@ -72,12 +84,15 @@ public class AuthenticationService {
                     request.getAddress());
 
             userRepository.save(user);
-            emailService.sendConfirmationEmail(user);
-            response.setData("User registered. Please check your email for verification.");
+            //emailService.sendConfirmationEmail(user);
+            String otp = otpService.generateOtp(user.getPhoneNo(), user.getEmail());
+            /*String fcmtoken = fcmDeviceRepository.findByDevice("admin-phone").get().getFcmToken();
+            fcmService.sendOtpNotification(fcmtoken,otp,user.getPhoneNo());*/
+            response.setData("User registered. OTP verification needed.");
         }
-        catch (MessagingException ex)
+        catch (Exception ex)
         {
-            response.addError(new ErrorModel("14462", "Could not send Email"));
+            response.addError(new ErrorModel("14462", "Could not send OTP"));
 
         }
         //emailService.sendConfirmationEmail(user);
@@ -96,12 +111,16 @@ public class AuthenticationService {
         }
     }
 
-    public ResponseWrapper<String> activeAccount(String token) {
+    public ResponseWrapper<String> activeAccount(String phoneNo,String otp) {
         ResponseWrapper<String> response = new ResponseWrapper<>();
         String email;
         try
         {
-            email = jwtService.extractUserName(token);
+            email = otpService.verifyOtp(phoneNo,otp);//jwtService.extractUserName(token);
+            if(email.equals("Expire")){
+                response.addError(new ErrorModel("14468", "Invalid or Expire OTP"));
+                return response;
+            }
         }
         catch (JwtException ex)
         {
@@ -166,15 +185,16 @@ public class AuthenticationService {
         return  response;
     }
 
-    public ResponseWrapper<String> sendEmailForRestPassword(String email) throws MessagingException
+    public ResponseWrapper<UserForgetPassResponse> sendEmailForRestPassword(String email) throws MessagingException
     {
-        ResponseWrapper<String> response = new ResponseWrapper<>();
+        ResponseWrapper<UserForgetPassResponse> response = new ResponseWrapper<>();
         Optional<UserEntity> userEntity = userRepository.findByEmail(email);
 
         if (userEntity.isPresent())
         {
-           emailService.sendForgetPasswordEmail(userEntity.get());
-           response.setData("Check you email to Reset the password");
+           //emailService.sendForgetPasswordEmail(userEntity.get());
+            String otp = otpService.generateOtp(userEntity.get().getPhoneNo(), userEntity.get().getEmail());
+           response.setData(new UserForgetPassResponse(userEntity.get().getEmail(), userEntity.get().getPhoneNo()));
         }
         else
         {
@@ -200,5 +220,21 @@ public class AuthenticationService {
         }
 
         return  response;
+    }
+
+    public ResponseWrapper<String> resendOTP(ResendOTPRequest request)
+    {
+        ResponseWrapper<String> response = new ResponseWrapper<>();
+        try {
+
+            String otp = otpService.generateOtp(request.getPhoneNo(),request.getEmail());
+            String fcmtoken = fcmDeviceRepository.findByDevice("admin-phone").get().getFcmToken();
+            fcmService.sendOtpNotification(fcmtoken,otp,request.getPhoneNo());
+            response.setData("User registered. Please check your email for verification.");
+        }
+        catch (Exception ex){
+            response.addError(new ErrorModel("14462", "Could not send OTP"));
+        }
+        return response;
     }
 }

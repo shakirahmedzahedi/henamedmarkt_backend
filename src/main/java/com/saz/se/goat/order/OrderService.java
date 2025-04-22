@@ -12,6 +12,7 @@ import com.saz.se.goat.user.UserRepository;
 import com.saz.se.goat.utils.CommonDTO;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +34,8 @@ public class OrderService
     DiscountCouponRepository discountCouponRepository;
     @Autowired
     CartRepository cartRepository;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
     CommonDTO commonDTO = new CommonDTO();;
 
     @Transactional
@@ -69,7 +72,7 @@ public class OrderService
         }
         cartRepository.save(cart);
         userRepository.save(user);
-
+        messagingTemplate.convertAndSend("/topic/newOrder", "New order received");
         return commonDTO.toOrderDTO(order);
 
     }

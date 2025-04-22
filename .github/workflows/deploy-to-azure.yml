@@ -109,9 +109,6 @@ jobs:
             docker stop goat || true
             docker rm goat || true
 
-            mkdir -p /firebase
-            echo '${{ secrets.FIREBASE_JSON }}' > /firebase/firebase.json
-
             docker run -d --name goat -p 8080:8080 \
               -e FIREBASE_JSON="${{ secrets.FIREBASE_JSON }}" \
               ${{ secrets.AZURE_REGISTRY_LOGIN_SERVER }}/api:${{ github.sha }}

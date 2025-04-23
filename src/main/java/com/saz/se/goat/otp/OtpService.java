@@ -30,8 +30,13 @@ public class OtpService {
     public String verifyOtp(String phoneNumber, String otp) {
         OtpEntry entry = otpStorage.get(phoneNumber);
         if (entry == null) return "Expire";
-        if (LocalDateTime.now().isAfter(entry.expiryTime)) return "Expire";
-        return entry.email;
+        if(entry.otp.equals(otp)){
+            if (LocalDateTime.now().isAfter(entry.expiryTime)) return "Expire";
+            return entry.email;
+        }
+        else {
+            return "Expire";
+        }
     }
 
     private static class OtpEntry {

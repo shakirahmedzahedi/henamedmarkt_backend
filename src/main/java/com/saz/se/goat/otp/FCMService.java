@@ -19,15 +19,16 @@ public class FCMService {
         // Create the FCM message
         Message message = Message.builder()
                 .setToken(fcmToken)
-                .setNotification(Notification.builder()
+                /*.setNotification(Notification.builder()
                         .setTitle("Your OTP Code")
                         .setBody("Your OTP is: " + otp)
-                        .build())
+                        .build())*/
                 .putData("otp", otp)
                 .putData("phoneNumber", phone)
                 .build();
 
         try {
+            System.out.println(" message: " + message.toString());
             // Send the message using Firebase Admin SDK
             String response = FirebaseMessaging.getInstance().send(message);
             System.out.println("Successfully sent message: " + response);

@@ -65,7 +65,7 @@ public class AuthenticationController {
             response.addError(new ErrorModel("14464", "Invalid User name or Password"));
             return jsonUtils.responseAsJson(response);
         }
-        return jsonUtils.responseAsJsonWithToken(response,request.getEmail());
+        return jsonUtils.responseAsJsonWithToken(response,userDTO.getEmail());
     }
 
     /*@CrossOrigin

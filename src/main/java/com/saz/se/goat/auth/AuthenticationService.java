@@ -79,9 +79,8 @@ public class AuthenticationService {
             return response;
         }
 
-        try
-        {
-            UserEntity user = new UserEntity (
+        try {
+            UserEntity user = new UserEntity(
                     request.getFirstName(),
                     request.getLastName(),
                     request.getEmail(),
@@ -93,11 +92,9 @@ public class AuthenticationService {
             //emailService.sendConfirmationEmail(user);
             String otp = otpService.generateOtp(user.getPhoneNo(), user.getEmail());
             String fcmtoken = fcmDeviceRepository.findByDevice("admin-phone").get().getFcmToken();
-            fcmService.sendOtpNotification(fcmtoken,otp,user.getPhoneNo());
+            fcmService.sendOtpNotification(fcmtoken, otp, user.getPhoneNo());
             response.setData("User registered. OTP verification needed.");
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             response.addError(new ErrorModel("14462", "Could not send OTP"));
 
         }
@@ -117,130 +114,123 @@ public class AuthenticationService {
         }
     }
 
-    public ResponseWrapper<String> activeAccount(String phoneNo,String otp) {
+    public ResponseWrapper<String> activeAccount(String phoneNo, String otp) {
         ResponseWrapper<String> response = new ResponseWrapper<>();
         String email;
-        try
-        {
-            email = otpService.verifyOtp(phoneNo,otp);//jwtService.extractUserName(token);
-            if(email.equals("Expire")){
+        try {
+            email = otpService.verifyOtp(phoneNo, otp);//jwtService.extractUserName(token);
+            if (email.equals("Expire")) {
                 response.addError(new ErrorModel("14468", "Invalid or Expire OTP"));
                 return response;
             }
-        }
-        catch (JwtException ex)
-        {
+        } catch (JwtException ex) {
             response.addError(new ErrorModel("14463", ex.getMessage()));
             return response;
         }
-        UserEntity user  = userRepository.findByEmail(email).orElse(null);
+        UserEntity user = userRepository.findByEmail(email).orElse(null);
 
-        if (user == null)
-        {
+        if (user == null) {
             response.addError(new ErrorModel("14462", "User not valid"));
             return response;
-        }
-        else
-        {
-           user.setActive(true);
-           userRepository.save(user);
+        } else {
+            user.setActive(true);
+            userRepository.save(user);
         }
         response.setData("User Active. Please Log in");
-        return  response;
+        return response;
     }
 
-    public UserDTO signIn(SignInRequest request)
-    {
-        try
-        {
-            Authentication authentication = authManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
-            UserEntity user = userRepository.findByEmail(request.getEmail()).orElse(null);
-            if (authentication.isAuthenticated() && user.isActive())
-            {
+    public UserDTO signIn(SignInRequest request) {
+
+        String userName = request.getEmail();
+        String email;
+        UserEntity user;
+
+        try {
+            if (userName.contains("@")) {
+                user = userRepository.findByEmail(userName).orElse(null);
+            } else {
+                user = userRepository.findByPhoneNo("+"+userName).orElse(null);
+            }
+
+            if (user == null) {
+                throw new BadCredentialsException("User not found with provided credentials.");
+            }
+
+            email = user.getEmail();
+            Authentication authentication = authManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(email, request.getPassword())
+            );
+            if (authentication.isAuthenticated() && user.isActive()) {
                 return commonDTO.toUserDTO(user);
 
             }
 
         } catch (BadCredentialsException e) {
             // Handle invalid credentials
-             ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
+            ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
 
         }
 
-
-        return  null;
+        return null;
     }
 
 
-    public ResponseWrapper forgetPassword(ForgetPasswordRequest forgetPasswordRequest)
-    {
+    public ResponseWrapper forgetPassword(ForgetPasswordRequest forgetPasswordRequest) {
         ResponseWrapper<String> response = new ResponseWrapper<>();
         Optional<UserEntity> userEntity = userRepository.findByEmail(forgetPasswordRequest.getEmail());
 
-        if (userEntity.isPresent())
-        {
-           userEntity.get().setPassword( encoder.encode(forgetPasswordRequest.getPassword()));
-           userRepository.save(userEntity.get());
-           response.setData("Successfully Reset the password.");
-        }
-        else
-        {
+        if (userEntity.isPresent()) {
+            userEntity.get().setPassword(encoder.encode(forgetPasswordRequest.getPassword()));
+            userRepository.save(userEntity.get());
+            response.setData("Successfully Reset the password.");
+        } else {
             response.addError(new ErrorModel("14462", "Your are not Register User!"));
         }
 
-        return  response;
+        return response;
     }
 
-    public ResponseWrapper<UserForgetPassResponse> sendEmailForRestPassword(String email) throws MessagingException
-    {
+    public ResponseWrapper<UserForgetPassResponse> sendEmailForRestPassword(String email) throws MessagingException {
         ResponseWrapper<UserForgetPassResponse> response = new ResponseWrapper<>();
         Optional<UserEntity> userEntity = userRepository.findByEmail(email);
 
-        if (userEntity.isPresent())
-        {
-           //emailService.sendForgetPasswordEmail(userEntity.get());
+        if (userEntity.isPresent()) {
+            //emailService.sendForgetPasswordEmail(userEntity.get());
             String otp = otpService.generateOtp(userEntity.get().getPhoneNo(), userEntity.get().getEmail());
             String fcmtoken = fcmDeviceRepository.findByDevice("admin-phone").get().getFcmToken();
-            fcmService.sendOtpNotification(fcmtoken,otp,userEntity.get().getPhoneNo());
-           response.setData(new UserForgetPassResponse(userEntity.get().getEmail(), userEntity.get().getPhoneNo()));
-        }
-        else
-        {
+            fcmService.sendOtpNotification(fcmtoken, otp, userEntity.get().getPhoneNo());
+            response.setData(new UserForgetPassResponse(userEntity.get().getEmail(), userEntity.get().getPhoneNo()));
+        } else {
             response.addError(new ErrorModel("14462", "Your are not Register User!"));
         }
 
-        return  response;
+        return response;
 
     }
 
-    public ResponseWrapper<UserDTO>  renewToken(String email)
-    {
+    public ResponseWrapper<UserDTO> renewToken(String email) {
         ResponseWrapper<UserDTO> response = new ResponseWrapper<>();
         Optional<UserEntity> userEntity = userRepository.findByEmail(email);
-        if (userEntity.isPresent())
-        {
-           UserDTO userDTO = userEntity.map(commonDTO::toUserDTO).orElse(null);
-           response.setData(userDTO);
-        }
-        else
-        {
+        if (userEntity.isPresent()) {
+            UserDTO userDTO = userEntity.map(commonDTO::toUserDTO).orElse(null);
+            response.setData(userDTO);
+        } else {
             response.addError(new ErrorModel("14462", "Your are not Register User!"));
         }
 
-        return  response;
+        return response;
     }
 
-    public ResponseWrapper<String> resendOTP(ResendOTPRequest request)
-    {
+    public ResponseWrapper<String> resendOTP(ResendOTPRequest request) {
         ResponseWrapper<String> response = new ResponseWrapper<>();
         try {
 
-            String otp = otpService.generateOtp(request.getPhoneNo(),request.getEmail());
+            String otp = otpService.generateOtp(request.getPhoneNo(), request.getEmail());
             String fcmtoken = fcmDeviceRepository.findByDevice("admin-phone").get().getFcmToken();
-            fcmService.sendOtpNotification(fcmtoken,otp,request.getPhoneNo());
+            fcmService.sendOtpNotification(fcmtoken, otp, request.getPhoneNo());
             response.setData("OTP Send. Please check your phone.");
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             response.addError(new ErrorModel("14462", "Could not send OTP"));
         }
         return response;

@@ -73,6 +73,12 @@ public class AuthenticationService {
             return response;
         }
 
+        boolean isExit1 = userRepository.findByPhoneNo(request.getPhoneNo()).isPresent();
+        if (isExit1) {
+            response.addError(new ErrorModel("14462", "Phone number is already Already is use! "));
+            return response;
+        }
+
         try
         {
             UserEntity user = new UserEntity (
@@ -232,7 +238,7 @@ public class AuthenticationService {
             String otp = otpService.generateOtp(request.getPhoneNo(),request.getEmail());
             String fcmtoken = fcmDeviceRepository.findByDevice("admin-phone").get().getFcmToken();
             fcmService.sendOtpNotification(fcmtoken,otp,request.getPhoneNo());
-            response.setData("User registered. Please check your email for verification.");
+            response.setData("OTP Send. Please check your phone.");
         }
         catch (Exception ex){
             response.addError(new ErrorModel("14462", "Could not send OTP"));

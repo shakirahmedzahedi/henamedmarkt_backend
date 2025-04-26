@@ -68,6 +68,7 @@ public class AdminService
         product.setSize(request.getSize());
         product.setBestSeller(request.isBestSeller());
         product.setNewArrival(request.isNewArrival());
+        product.setExtraInfo(request.getExtraInfo());
         productRepository.save(product);
 
         return Optional.of(product);

@@ -28,4 +28,5 @@ public class UpdateProductRequest
     private String thumbnail;
     private boolean bestSeller;
     private boolean newArrival;
+    private String extraInfo;
 }
